@@ -19,16 +19,16 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
  */
 const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
   try {
-    console.log(req.file)
+    // console.log(req.file)
     console.log(req.body)
-    console.log(req.body.image)
+    // console.log(req.body.image)
     // 1. Check if an image file was uploaded
-    // if (!req.file) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     error: "No image file uploaded. Please upload an image with the key 'dashboardImage'.",
-    //   });
-    // }
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "No image file uploaded. Please upload an image with the key 'dashboardImage'.",
+      });
+    }
 
     // 2. The prompt is crucial. We ask the AI to act as an expert and return structured JSON.
     const diagnosisPrompt = `
@@ -70,8 +70,8 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
     // Multer's memory storage provides this as `req.file.buffer` and `req.file.mimetype`.
     const imagePart = {
       inlineData: {
-        data: req.body.dashboardImage,//req.file.buffer.toString("base64"),//
-        mimeType: req.body.mimeType,//req.file.mimetype,//
+        data: req.file.buffer.toString("base64"),//req.body.dashboardImage,//
+        mimeType: req.file.mimetype,//req.body.mimeType,//
       },
     };
 
@@ -118,7 +118,7 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
         youtubeUrl = null;
     }
     const createdDiagnosis=await Diagnostic.create({
-      userId:req.body.userId,
+      userId:'685e6718742d2eed871a2bda',//req.body.userId,
       tutorialVideo:youtubeUrl,
       fault:diagnosis.fault,
       summary:diagnosis.summary,
@@ -133,7 +133,7 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
     });
 
   } catch (error:any) {
-    console.error("Error in dashboard image analysis controller:", error.message.slice(0,200));
+    console.error("Error in dashboard image analysis controller:", error.message.slice(0,300));
     res.status(500).json({
       success: false,
       error: "An internal server error occurred while analyzing the image.",
