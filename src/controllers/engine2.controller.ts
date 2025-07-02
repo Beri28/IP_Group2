@@ -134,6 +134,14 @@ export default function analyzeEngineSound2(
         }
 
         let youtubeUrl = null;
+        if(diagnosis.error){
+          return res.status(200).json({
+            success: true,
+            diagnosis: diagnosis.error,
+            tutorialVideo: ""
+            
+          });
+        }
         try {
             let searchQuery = diagnosis?.problem[0].diagnosis || (diagnosis?.summary) || "car engine sound";
             const params = qs.stringify({

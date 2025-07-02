@@ -23,12 +23,12 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
     console.log(req.body)
     // console.log(req.body.image)
     // 1. Check if an image file was uploaded
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: "No image file uploaded. Please upload an image with the key 'dashboardImage'.",
-      });
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     error: "No image file uploaded. Please upload an image with the key 'dashboardImage'.",
+    //   });
+    // }
 
     // 2. The prompt is crucial. We ask the AI to act as an expert and return structured JSON.
     const diagnosisPrompt = `
@@ -70,8 +70,8 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
     // Multer's memory storage provides this as `req.file.buffer` and `req.file.mimetype`.
     const imagePart = {
       inlineData: {
-        data: req.file.buffer.toString("base64"),//req.body.dashboardImage,//
-        mimeType: req.file.mimetype,//req.body.mimeType,//
+        data: req.body.dashboardImage,//req.file.buffer.toString("base64"),//
+        mimeType: req.body.mimeType,//req.file.mimetype,//
       },
     };
 
@@ -100,6 +100,14 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
 
     // 6. Search YouTube for a relevant tutorial video based on the diagnosis
     let youtubeUrl = null;
+    if(diagnosis.error){
+      return res.status(200).json({
+      success: true,
+      diagnosis: diagnosis.error,
+      tutorialVideo: ""
+      
+    });
+    }
     try {
         let searchQuery = diagnosis?.diagnosisSummary || (diagnosis?.indicators?.[0]?.name) || "car dashboard warning light";
         const params = qs.stringify({
@@ -125,6 +133,7 @@ const analyzeDashboard = async (req:Request, res:Response):Promise<any> => {
       recommendation:diagnosis.recommendation,
       indicators:diagnosis.indicators
     })
+    console.log(createdDiagnosis)
     // 7. Send the successful diagnosis and YouTube tutorial video URL back to the client
     res.status(200).json({
       success: true,
